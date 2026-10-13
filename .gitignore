@@ -1,0 +1,7 @@
+node_modules/
+bin/yt-dlp*
+cookies.txt
+*.cookies
+*.log
+.env
+.DS_Store

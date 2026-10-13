@@ -1,0 +1,33 @@
+{
+  "name": "tool-download-video",
+  "version": "1.0.0",
+  "description": "Minimalist, Diskless Streaming Proxy video/audio downloader inspired by Cobalt",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "setup:bin": "node src/setup-binaries.js",
+    "prestart": "node src/setup-binaries.js",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test test/**/*.test.js"
+  },
+  "keywords": [
+    "video-downloader",
+    "tiktok",
+    "youtube",
+    "bilibili",
+    "cobalt",
+    "streaming-proxy",
+    "diskless"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "ffmpeg-static": "^5.2.0"
+  }
+}

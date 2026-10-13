@@ -1,0 +1,18 @@
+services:
+  video-downloader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tool-download-video
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - MAX_DURATION=1800
+      - COOKIES_PATH=/app/cookies.txt
+    volumes:
+      # Mount file cookies.txt nếu có để vượt bot detection của YouTube
+      - ./cookies.txt:/app/cookies.txt:ro

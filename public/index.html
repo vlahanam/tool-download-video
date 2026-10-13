@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="vi" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cobalt Media Downloader - Tải Video TikTok, YouTube, Bilibili</title>
+    <meta
+      name="description"
+      content="Trình tải video và âm thanh trực tiếp từ TikTok (không watermark), YouTube (lên tới 4K), và Bilibili theo phong cách Cobalt tối giản, không quảng cáo."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="tailwind.min.js"></script>
+    <script>
+      if (typeof tailwind === 'undefined') {
+        document.write('<script src="https://cdn.tailwindcss.com"><\/script>');
+      }
+    </script>
+    <script>
+      window.tailwind && (window.tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              surface: 'var(--bg-surface)',
+              main: 'var(--text-main)',
+              primary: {
+                500: '#06b6d4',
+                600: '#0891b2',
+              }
+            }
+          }
+        }
+      });
+    </script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body
+    class="bg-surface text-main font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-primary-500 selection:text-white"
+  >
+    <!-- Header -->
+    <header
+      class="w-full max-w-4xl mx-auto px-4 py-6 flex items-center justify-between"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-extrabold text-xl"
+        >
+          ⚡
+        </div>
+        <div>
+          <h1
+            class="text-xl font-bold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent"
+          >
+            Cobalt Stream
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Diskless Media Proxy</p>
+        </div>
+      </div>
+
+      <!-- Theme & Info actions -->
+      <div class="flex items-center gap-3">
+        <button id="themeToggleBtn" aria-label="Toggle theme" class="btn-icon">
+          <svg
+            id="moonIcon"
+            class="w-5 h-5 hidden"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+            />
+          </svg>
+          <svg
+            id="sunIcon"
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 3v1m0 16v1m9-9h-1M4 9h1m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 5a7 7 0 100 14 7 7 0 000-14z"
+            />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main
+      class="w-full max-w-3xl mx-auto px-4 flex-1 flex flex-col justify-center py-8"
+    >
+      <!-- Title & Subtitle -->
+      <div class="text-center mb-8 space-y-2">
+        <h2
+          class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100"
+        >
+          Tải video không quảng cáo
+        </h2>
+        <p class="text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          Dán liên kết từ
+          <span class="text-cyan-500 dark:text-cyan-400 font-semibold">TikTok</span>,
+          <span class="text-red-500 dark:text-red-400 font-semibold">YouTube</span> hoặc
+          <span class="text-pink-500 dark:text-pink-400 font-semibold">Bilibili</span> để tải ngay.
+        </p>
+      </div>
+
+      <!-- Omnibox Container -->
+      <div class="omnibox-wrapper relative mb-6">
+        <div
+          class="relative flex items-center bg-white/90 dark:bg-slate-900/80 border border-slate-300 dark:border-slate-700/80 hover:border-cyan-500/50 focus-within:border-cyan-500 rounded-2xl shadow-xl dark:shadow-2xl backdrop-blur-xl transition-all duration-300 p-2"
+        >
+          <!-- Platform Badge inside input -->
+          <div
+            id="platformBadge"
+            class="hidden pl-2 pr-1 flex items-center gap-1.5 text-xs font-bold rounded-lg py-1 px-2.5 transition-all"
+          >
+            <span id="platformIcon" class="w-4 h-4 inline-block"></span>
+            <span id="platformName">Platform</span>
+          </div>
+
+          <input
+            id="urlInput"
+            type="url"
+            placeholder="Dán liên kết video hoặc âm thanh vào đây..."
+            class="w-full bg-transparent px-3 py-3 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm sm:text-base focus:outline-none"
+            autocomplete="off"
+            spellcheck="false"
+          />
+
+          <!-- Clear Button -->
+          <button
+            id="clearBtn"
+            class="hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-2 transition-colors"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <!-- Paste Button -->
+          <button
+            id="pasteBtn"
+            title="Dán từ Clipboard"
+            class="btn-paste flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700/50"
+          >
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            <span class="hidden sm:inline">Dán</span>
+          </button>
+
+          <!-- Submit Button -->
+          <button
+            id="submitBtn"
+            class="ml-2 flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg
+              id="submitArrow"
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2.5"
+                d="M14 5l7 7m0 0l-7 7m7-7H3"
+              />
+            </svg>
+            <div
+              id="submitSpinner"
+              class="hidden w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"
+            ></div>
+          </button>
+        </div>
+
+        <!-- Quick Platform Hints -->
+        <div
+          class="flex items-center justify-center gap-6 mt-3 text-xs text-slate-500 dark:text-slate-400"
+        >
+          <span
+            class="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span> TikTok (No
+            Watermark)
+          </span>
+          <span
+            class="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <span class="w-2 h-2 rounded-full bg-red-400"></span> YouTube (Lên
+            tới 4K)
+          </span>
+          <span
+            class="flex items-center gap-1.5 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
+          >
+            <span class="w-2 h-2 rounded-full bg-pink-400"></span> Bilibili
+            (Full HD)
+          </span>
+        </div>
+      </div>
+
+      <!-- Error Alert Box -->
+      <div
+        id="errorBox"
+        class="hidden mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800/60 text-red-600 dark:text-red-300 text-sm flex items-start gap-3 backdrop-blur-sm animate-fade-in"
+      >
+        <svg
+          class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <div id="errorMessage" class="flex-1"></div>
+      </div>
+
+      <!-- Preview & Format Options Card -->
+      <div
+        id="previewCard"
+        class="hidden bg-white/95 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-2xl backdrop-blur-xl animate-fade-in space-y-6"
+      >
+        <!-- Media Header Info -->
+        <div
+          class="flex flex-col sm:flex-row gap-4 items-start sm:items-center"
+        >
+          <!-- Thumbnail -->
+          <div
+            class="relative w-full sm:w-48 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0 border border-slate-200 dark:border-slate-700/50"
+          >
+            <img
+              id="previewThumbnail"
+              src=""
+              alt="Thumbnail"
+              class="w-full h-full object-cover"
+            />
+            <span
+              id="previewDuration"
+              class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/80 backdrop-blur-md rounded text-xs font-bold text-white tracking-wider"
+            >
+              00:00
+            </span>
+          </div>
+
+          <!-- Details -->
+          <div class="flex-1 space-y-1.5 min-w-0">
+            <div class="flex items-center gap-2">
+              <span
+                id="previewPlatformBadge"
+                class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400 border border-slate-200 dark:border-slate-700"
+              >
+                Platform
+              </span>
+              <span id="previewAuthor" class="text-xs text-slate-500 dark:text-slate-400 truncate"
+                >Author</span
+              >
+            </div>
+            <h3
+              id="previewTitle"
+              class="text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 line-clamp-2 leading-snug"
+            >
+              Media Title
+            </h3>
+          </div>
+        </div>
+
+        <hr class="border-slate-200 dark:border-slate-800" />
+
+        <!-- Formats Section -->
+        <div class="space-y-4">
+          <!-- Video Formats -->
+          <div>
+            <h4
+              class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1.5"
+            >
+              <svg
+                class="w-4 h-4 text-cyan-500 dark:text-cyan-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+              Định dạng Video
+            </h4>
+            <div
+              id="videoFormatsList"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
+            >
+              <!-- Dynamic Buttons -->
+            </div>
+          </div>
+
+          <!-- Audio Formats -->
+          <div>
+            <h4
+              class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1.5"
+            >
+              <svg
+                class="w-4 h-4 text-emerald-500 dark:text-emerald-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                />
+              </svg>
+              Tách Âm Thanh Riêng
+            </h4>
+            <div
+              id="audioFormatsList"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
+            >
+              <!-- Dynamic Audio Buttons -->
+            </div>
+          </div>
+
+          <!-- Photos Section (TikTok Slide Album) -->
+          <div id="photosSection" class="hidden">
+            <div class="flex items-center justify-between mb-2.5">
+              <h4
+                class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5"
+              >
+                <svg
+                  class="w-4 h-4 text-amber-500 dark:text-amber-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+                Album Ảnh TikTok (<span id="photoCount">0</span> ảnh)
+              </h4>
+              <button
+                id="downloadAllPhotosBtn"
+                class="btn-download bg-amber-500/20 hover:bg-amber-500/30 text-amber-600 dark:text-amber-300 border border-amber-500/40 text-xs py-1.5 px-3"
+              >
+                📦 Tải toàn bộ Album (.ZIP)
+              </button>
+            </div>
+            <div
+              id="photosGrid"
+              class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-56 overflow-y-auto p-1 rounded-xl bg-slate-100 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800"
+            >
+              <!-- Dynamic photo thumbnails -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Downloading Status Banner -->
+        <div
+          id="downloadBanner"
+          class="hidden p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800/60 text-cyan-800 dark:text-cyan-300 text-xs flex items-center gap-2.5 animate-pulse"
+        >
+          <div
+            class="w-4 h-4 border-2 border-cyan-500/30 border-t-cyan-500 dark:border-cyan-400/30 dark:border-t-cyan-400 rounded-full animate-spin"
+          ></div>
+          <span
+            >Đang khởi tạo luồng stream tải về trực tiếp từ máy chủ... Hãy giữ
+            mở trình duyệt!</span
+          >
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+      class="w-full max-w-4xl mx-auto px-4 py-6 text-center text-xs text-slate-500"
+    >
+      <p>
+        Cobalt Media Downloader • Không quảng cáo • Diskless Streaming
+        Architecture
+      </p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
