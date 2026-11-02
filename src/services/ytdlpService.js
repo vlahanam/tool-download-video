@@ -1,4 +1,6 @@
 import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 import { spawn } from 'node:child_process';
 import { config } from '../config.js';
 
@@ -129,6 +131,76 @@ export class YtdlpService {
     }
 
     return spawn(this.getExecutable(), args);
+  }
+
+  /**
+   * Tải nội dung phụ đề qua yt-dlp vào thư mục tạm và đọc vào bộ nhớ (rồi dọn sạch file tạm)
+   * @param {string} url 
+   * @param {string} trackKey 
+   * @param {string} [platform] 
+   * @returns {Promise<{ content: string, ext: string }>}
+   */
+  async downloadSubtitleContent(url, trackKey, platform = '') {
+    const tmpDir = os.tmpdir();
+    const uniquePrefix = `sub_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const outputTemplate = path.join(tmpDir, `${uniquePrefix}_%(id)s`);
+
+    const args = [
+      '--skip-download',
+      '--write-subs',
+      '--write-auto-subs',
+      '--sub-langs', trackKey,
+      '--sub-format', 'vtt/srt/best',
+      '--no-playlist',
+      '--no-warnings',
+      '--no-check-certificates',
+      '-o', outputTemplate,
+      url
+    ];
+
+    if (this.hasValidCookiesFile()) {
+      args.unshift('--cookies', config.cookiesPath);
+    }
+
+    if (platform === 'bilibili') {
+      args.push('--add-header', 'Referer:https://www.bilibili.com/');
+    }
+
+    return new Promise((resolve, reject) => {
+      const child = spawn(this.getExecutable(), args);
+      let stderr = '';
+
+      child.stderr.on('data', d => { stderr += d; });
+
+      child.on('error', err => {
+        reject(new Error(`Không thể khởi chạy yt-dlp tải phụ đề: ${err.message}`));
+      });
+
+      child.on('close', code => {
+        try {
+          const files = fs.readdirSync(tmpDir).filter(f => f.startsWith(uniquePrefix));
+          if (files.length > 0) {
+            const targetFile = path.join(tmpDir, files[0]);
+            const content = fs.readFileSync(targetFile, 'utf-8');
+            const ext = path.extname(targetFile).replace('.', '') || 'vtt';
+
+            for (const f of files) {
+              try { fs.unlinkSync(path.join(tmpDir, f)); } catch {}
+            }
+
+            return resolve({ content, ext });
+          }
+        } catch (e) {
+          return reject(e);
+        }
+
+        if (code !== 0) {
+          return reject(new Error(`yt-dlp tải phụ đề thất bại (code ${code}): ${stderr.slice(0, 200)}`));
+        }
+
+        reject(new Error('Không tìm thấy tệp phụ đề được tạo sau khi tải.'));
+      });
+    });
   }
 }
 

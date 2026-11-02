@@ -22,6 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const previewTitle = document.getElementById('previewTitle');
   const videoFormatsList = document.getElementById('videoFormatsList');
   const audioFormatsList = document.getElementById('audioFormatsList');
+  const videoSection = document.getElementById('videoSection');
+  const audioSection = document.getElementById('audioSection');
+  const transcriptSection = document.getElementById('transcriptSection');
+  const transcriptsList = document.getElementById('transcriptsList');
+  const tabAll = document.getElementById('tabAll');
+  const tabVideo = document.getElementById('tabVideo');
+  const tabAudio = document.getElementById('tabAudio');
+  const tabTranscript = document.getElementById('tabTranscript');
   const photosSection = document.getElementById('photosSection');
   const photoCount = document.getElementById('photoCount');
   const photosGrid = document.getElementById('photosGrid');
@@ -53,6 +61,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     localStorage.setItem('theme', theme);
   }
+
+  // --- Option Mode Tabs Logic (Cùng cấp: Tất cả / Video / Âm thanh / Transcript) ---
+  let activeTab = 'all';
+
+  function applyTab(tab) {
+    activeTab = tab;
+    const tabButtons = [
+      { id: 'all', el: tabAll },
+      { id: 'video', el: tabVideo },
+      { id: 'audio', el: tabAudio },
+      { id: 'transcript', el: tabTranscript }
+    ];
+
+    tabButtons.forEach(({ id, el }) => {
+      if (!el) return;
+      if (id === tab) {
+        el.className = 'tab-btn py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-sm border border-slate-200 dark:border-slate-700/80';
+      } else {
+        el.className = 'tab-btn py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-700/50';
+      }
+    });
+
+    const isAll = tab === 'all';
+    if (videoSection) videoSection.classList.toggle('hidden', !isAll && tab !== 'video');
+    if (audioSection) audioSection.classList.toggle('hidden', !isAll && tab !== 'audio');
+
+    const isTranscriptSupported = currentMediaData && (currentMediaData.platform === 'youtube' || currentMediaData.platform === 'bilibili');
+    if (transcriptSection) {
+      transcriptSection.classList.toggle('hidden', (!isAll && tab !== 'transcript') || !isTranscriptSupported);
+    }
+  }
+
+  [tabAll, tabVideo, tabAudio, tabTranscript].forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        applyTab(btn.getAttribute('data-tab'));
+      });
+    }
+  });
 
   // --- Platform Detection ---
   function detectPlatform(text) {
@@ -233,6 +280,81 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       audioFormatsList.innerHTML = '<p class="text-xs text-slate-500 col-span-2">Không tìm thấy định dạng âm thanh riêng.</p>';
     }
+
+    // Render Transcript / Subtitles (YouTube & Bilibili)
+    const isSupportedTranscriptPlatform = data.platform === 'youtube' || data.platform === 'bilibili';
+    if (tabTranscript) {
+      tabTranscript.classList.toggle('hidden', !isSupportedTranscriptPlatform);
+    }
+
+    if (isSupportedTranscriptPlatform) {
+      transcriptsList.innerHTML = '';
+
+      const targetLangs = [
+        { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
+        { code: 'en', label: 'Tiếng Anh', flag: '🇬🇧' },
+        { code: 'zh', label: 'Tiếng Trung', flag: '🇨🇳' }
+      ];
+
+      const availableTranscripts = data.transcripts || [];
+
+      targetLangs.forEach(lang => {
+        const found = availableTranscripts.find(t => t.lang === lang.code);
+
+        if (found) {
+          // Nút tải SRT
+          const srtBtn = document.createElement('a');
+          srtBtn.className = 'btn-download bg-indigo-50/90 hover:bg-indigo-100 dark:bg-indigo-950/30 dark:hover:bg-indigo-900/40 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800/50';
+          srtBtn.href = `/api/download?url=${encodeURIComponent(sourceUrl)}&mode=transcript&lang=${lang.code}&format=srt`;
+          srtBtn.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-base">${lang.flag}</span>
+              <span>${lang.label} (SRT)</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${found.isAuto ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300'}">
+                ${found.isAuto ? 'Tự động' : 'Chính thức'}
+              </span>
+            </div>
+            <span class="text-xs text-indigo-600 dark:text-indigo-400 font-normal">Phụ đề .SRT</span>
+          `;
+          srtBtn.addEventListener('click', showDownloadNotice);
+          transcriptsList.appendChild(srtBtn);
+
+          // Nút tải TXT
+          const txtBtn = document.createElement('a');
+          txtBtn.className = 'btn-download bg-indigo-50/90 hover:bg-indigo-100 dark:bg-indigo-950/30 dark:hover:bg-indigo-900/40 text-indigo-900 dark:text-indigo-200 border border-indigo-200 dark:border-indigo-800/50';
+          txtBtn.href = `/api/download?url=${encodeURIComponent(sourceUrl)}&mode=transcript&lang=${lang.code}&format=txt`;
+          txtBtn.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-base">${lang.flag}</span>
+              <span>${lang.label} (TXT)</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded font-medium ${found.isAuto ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300' : 'bg-cyan-100 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300'}">
+                ${found.isAuto ? 'Tự động' : 'Chính thức'}
+              </span>
+            </div>
+            <span class="text-xs text-indigo-600 dark:text-indigo-400 font-normal">Văn bản .TXT</span>
+          `;
+          txtBtn.addEventListener('click', showDownloadNotice);
+          transcriptsList.appendChild(txtBtn);
+        } else {
+          // Trạng thái chưa có phụ đề cho ngôn ngữ này
+          const disabledBtn = document.createElement('div');
+          disabledBtn.className = 'btn-download bg-slate-100/50 dark:bg-slate-800/30 text-slate-400 dark:text-slate-500 border border-slate-200/50 dark:border-slate-800/50 opacity-60 cursor-not-allowed';
+          disabledBtn.innerHTML = `
+            <div class="flex items-center gap-2">
+              <span class="text-base">${lang.flag}</span>
+              <span>${lang.label}</span>
+            </div>
+            <span class="text-xs text-slate-400 dark:text-slate-500 italic">Chưa có phụ đề</span>
+          `;
+          transcriptsList.appendChild(disabledBtn);
+        }
+      });
+    }
+
+    if (!isSupportedTranscriptPlatform && activeTab === 'transcript') {
+      activeTab = 'all';
+    }
+    applyTab(activeTab);
 
     // Render Photo Slides (TikTok)
     if (data.isPhotoAlbum && data.photos && data.photos.length > 0) {

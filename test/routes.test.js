@@ -87,5 +87,29 @@ describe('Server & API Routes Integration Test', () => {
     const res = await fetch(`${baseUrl}/non-existent-page`);
     assert.strictEqual(res.status, 404);
   });
+
+  it('GET /api/download mode=transcript không truyền url -> trả về lỗi 400', async () => {
+    const res = await fetch(`${baseUrl}/api/download?mode=transcript&lang=vi&format=srt`);
+    assert.strictEqual(res.status, 400);
+    const data = await res.json();
+    assert.strictEqual(data.status, 'error');
+    assert.match(data.message, /url/);
+  });
+
+  it('GET /api/download mode=transcript chọn ngôn ngữ không hợp lệ -> trả về lỗi 400', async () => {
+    const res = await fetch(`${baseUrl}/api/download?url=https://www.youtube.com/watch?v=jNQXAC9IVRw&mode=transcript&lang=fr&format=srt`);
+    assert.strictEqual(res.status, 400);
+    const data = await res.json();
+    assert.strictEqual(data.status, 'error');
+    assert.match(data.message, /không được hỗ trợ/);
+  });
+
+  it('GET /api/download mode=transcript chọn định dạng không hợp lệ -> trả về lỗi 400', async () => {
+    const res = await fetch(`${baseUrl}/api/download?url=https://www.youtube.com/watch?v=jNQXAC9IVRw&mode=transcript&lang=vi&format=pdf`);
+    assert.strictEqual(res.status, 400);
+    const data = await res.json();
+    assert.strictEqual(data.status, 'error');
+    assert.match(data.message, /không hợp lệ/);
+  });
 });
 

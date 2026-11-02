@@ -304,10 +304,46 @@
 
         <hr class="border-slate-200 dark:border-slate-800" />
 
+        <!-- Option Mode Tabs (Cùng cấp: Tất cả, Video, Âm thanh, Transcript) -->
+        <div id="modeTabs" class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 bg-slate-100/90 dark:bg-slate-800/80 rounded-2xl border border-slate-200 dark:border-slate-700/60 text-xs font-bold">
+          <button
+            type="button"
+            data-tab="all"
+            id="tabAll"
+            class="tab-btn py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 bg-white dark:bg-slate-900 text-cyan-600 dark:text-cyan-400 shadow-sm border border-slate-200 dark:border-slate-700/80"
+          >
+            <span>📋</span> Tất cả
+          </button>
+          <button
+            type="button"
+            data-tab="video"
+            id="tabVideo"
+            class="tab-btn py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-700/50"
+          >
+            <span>🎬</span> Định dạng Video
+          </button>
+          <button
+            type="button"
+            data-tab="audio"
+            id="tabAudio"
+            class="tab-btn py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-700/50"
+          >
+            <span>🎵</span> Tách Âm Thanh Riêng
+          </button>
+          <button
+            type="button"
+            data-tab="transcript"
+            id="tabTranscript"
+            class="tab-btn py-2 px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white/50 dark:hover:bg-slate-700/50"
+          >
+            <span>📝</span> Transcript
+          </button>
+        </div>
+
         <!-- Formats Section -->
-        <div class="space-y-4">
-          <!-- Video Formats -->
-          <div>
+        <div class="space-y-5">
+          <!-- Video Formats Section -->
+          <div id="videoSection">
             <h4
               class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1.5"
             >
@@ -334,8 +370,8 @@
             </div>
           </div>
 
-          <!-- Audio Formats -->
-          <div>
+          <!-- Audio Formats Section -->
+          <div id="audioSection">
             <h4
               class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1.5"
             >
@@ -359,6 +395,34 @@
               class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
             >
               <!-- Dynamic Audio Buttons -->
+            </div>
+          </div>
+
+          <!-- Transcript Section (YouTube & Bilibili) -->
+          <div id="transcriptSection" class="hidden">
+            <h4
+              class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1.5"
+            >
+              <svg
+                class="w-4 h-4 text-indigo-500 dark:text-indigo-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+              Transcript / Phụ Đề (TXT / SRT)
+            </h4>
+            <div
+              id="transcriptsList"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"
+            >
+              <!-- Dynamic Transcript Buttons -->
             </div>
           </div>
 

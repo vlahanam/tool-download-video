@@ -1,5 +1,6 @@
 import { extractMediaInfo } from '../extractors/index.js';
 import { streamService } from '../services/streamService.js';
+import { transcriptService } from '../services/transcriptService.js';
 
 /**
  * Xử lý endpoint /api/download
@@ -8,7 +9,7 @@ import { streamService } from '../services/streamService.js';
  */
 export async function handleDownloadRoute(req, res) {
   const query = req.query || Object.fromEntries((new URL(req.url, `http://${req.headers.host}`)).searchParams);
-  const { url, format_id, mode } = query;
+  const { url, format_id, mode, lang, format } = query;
 
   if (!url) {
     res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -16,6 +17,17 @@ export async function handleDownloadRoute(req, res) {
   }
 
   try {
+    // 0. Tải transcript định dạng TXT hoặc SRT
+    if (mode === 'transcript' || mode === 'subtitles') {
+      return await transcriptService.downloadTranscript({
+        url,
+        lang,
+        format,
+        req,
+        res
+      });
+    }
+
     const data = await extractMediaInfo(url);
 
     // 1. Tải album ảnh TikTok dạng ZIP

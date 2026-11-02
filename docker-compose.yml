@@ -14,5 +14,8 @@ services:
       - MAX_DURATION=10800
       - COOKIES_PATH=/app/cookies.txt
     volumes:
+      # Mount mã nguồn và giao diện để phản ánh ngay lập tức các thay đổi
+      - ./src:/app/src
+      - ./public:/app/public
       # Mount file cookies.txt nếu có để vượt bot detection của YouTube
       - ./cookies.txt:/app/cookies.txt:ro

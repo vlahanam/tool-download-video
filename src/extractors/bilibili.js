@@ -1,4 +1,5 @@
 import { ytdlpService } from '../services/ytdlpService.js';
+import { getAvailableTranscripts } from '../services/transcriptService.js';
 import { isDurationAllowed } from '../utils/validator.js';
 import { formatDuration, formatFileSize, formatDurationLimit } from '../utils/formatHelper.js';
 import { config } from '../config.js';
@@ -13,7 +14,11 @@ export const bilibiliExtractor = {
    */
   async extract(url) {
     const info = await ytdlpService.getMetadata(url, {
-      extraArgs: ['--add-header', 'Referer:https://www.bilibili.com/']
+      extraArgs: [
+        '--add-header', 'Referer:https://www.bilibili.com/',
+        '--write-subs',
+        '--sub-langs', 'all'
+      ]
     });
 
     if (info.duration && !isDurationAllowed(info.duration)) {
@@ -91,6 +96,7 @@ export const bilibiliExtractor = {
       duration: info.duration || 0,
       durationFormatted: formatDuration(info.duration || 0),
       formats,
+      transcripts: getAvailableTranscripts(info),
       isPhotoAlbum: false,
       photos: []
     };

@@ -1,4 +1,5 @@
 import { ytdlpService } from '../services/ytdlpService.js';
+import { transcriptService, getAvailableTranscripts } from '../services/transcriptService.js';
 import { isDurationAllowed } from '../utils/validator.js';
 import { formatDuration, formatFileSize, formatDurationLimit } from '../utils/formatHelper.js';
 import { config } from '../config.js';
@@ -12,7 +13,9 @@ export const youtubeExtractor = {
    * @returns {Promise<object>}
    */
   async extract(url) {
-    const info = await ytdlpService.getMetadata(url);
+    const info = await ytdlpService.getMetadata(url, {
+      extraArgs: ['--write-subs', '--write-auto-subs', '--sub-langs', 'vi.*,en.*,zh.*']
+    });
 
     // Kiểm tra giới hạn thời lượng
     if (info.duration && !isDurationAllowed(info.duration)) {
@@ -113,6 +116,7 @@ export const youtubeExtractor = {
       duration: info.duration || 0,
       durationFormatted: formatDuration(info.duration || 0),
       formats,
+      transcripts: getAvailableTranscripts(info),
       isPhotoAlbum: false,
       photos: []
     };
