@@ -1,12 +1,21 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { formatDuration, formatFileSize, getSafeContentDisposition } from '../src/utils/formatHelper.js';
+import { formatDuration, formatFileSize, getSafeContentDisposition, formatDurationLimit } from '../src/utils/formatHelper.js';
 
 describe('FormatHelper Utilities', () => {
   it('định dạng thời lượng (seconds -> mm:ss hoặc hh:mm:ss)', () => {
     assert.strictEqual(formatDuration(0), '00:00');
     assert.strictEqual(formatDuration(65), '01:05');
     assert.strictEqual(formatDuration(3665), '1:01:05');
+  });
+
+  it('định dạng thời lượng giới hạn tối đa thân thiện', () => {
+    assert.strictEqual(formatDurationLimit(0), '0 phút');
+    assert.strictEqual(formatDurationLimit(1800), '30 phút');
+    assert.strictEqual(formatDurationLimit(3600), '1 giờ');
+    assert.strictEqual(formatDurationLimit(5400), '90 phút');
+    assert.strictEqual(formatDurationLimit(7200), '2 giờ');
+    assert.strictEqual(formatDurationLimit(10800), '3 giờ');
   });
 
   it('định dạng kích thước file (bytes -> KB, MB, GB)', () => {

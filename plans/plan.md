@@ -35,7 +35,7 @@ flowchart TD
     Metadata --> Client
     
     Client -->|2. Chọn định dạng & Tải| API_Download["GET /api/download?url=...&format_id=..."]
-    API_Download --> Security2["URL Validator & Limit Check\n(Thời lượng <= 30 phút)"]
+    API_Download --> Security2["URL Validator & Limit Check\n(Thời lượng <= 3 giờ)"]
     Security2 --> StreamEngine["Streaming Engine (Diskless Proxy)"]
     
     subgraph StreamEngineDetails["Cơ chế Streaming Engine"]
@@ -111,7 +111,7 @@ tool-download-video/
   * YouTube: `youtube.com`, `youtu.be`, `m.youtube.com`, `www.youtube.com`
   * Bilibili: `bilibili.com`, `bilibili.tv`, `b23.tv`
 * Chặn mọi IP private / localhost / loopback (`127.0.0.1`, `localhost`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `169.254.169.254`).
-* Giới hạn thời lượng: Từ chối tải nếu video dài hơn `MAX_DURATION` (mặc định 1800 giây / 30 phút) để bảo vệ tài nguyên CPU.
+* Giới hạn thời lượng: Từ chối tải nếu video dài hơn `MAX_DURATION` (mặc định 10800 giây / 3 giờ) để bảo vệ tài nguyên CPU.
 
 #### 2. Xử lý Stream On-the-fly & Quản lý tiến trình (`src/services/streamService.js`)
 * **Trường hợp 1 (Direct Stream):** Single stream (TikTok MP4, Audio MP3/M4A) -> Pipe trực tiếp từ stream nguồn vào `res`.
@@ -178,7 +178,7 @@ tool-download-video/
 
 ### 2. Kiểm thử bảo mật & Validation:
 * Gọi `/api/info?url=http://127.0.0.1:3000` -> Xác nhận server trả về lỗi `400: Disallowed URL` (Chặn SSRF).
-* Gọi URL video YouTube dài > 30 phút -> Xác nhận server báo lỗi vượt quá thời lượng tối đa.
+* Gọi URL video YouTube dài > 3 giờ -> Xác nhận server báo lỗi vượt quá thời lượng tối đa.
 
 ### 3. Kiểm thử trích xuất & Tải từng nền tảng:
 * **TikTok:**

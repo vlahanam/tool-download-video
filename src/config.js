@@ -26,9 +26,9 @@ export const config = {
   cookiesPath: process.env.COOKIES_PATH || path.join(rootDir, 'cookies.txt'),
   
   // Security & limits
-  maxDurationSeconds: parseInt(process.env.MAX_DURATION || '1800', 10), // Mặc định 30 phút
+  maxDurationSeconds: parseInt(process.env.MAX_DURATION || '10800', 10), // Mặc định 3 giờ (10800s)
   requestTimeoutMs: parseInt(process.env.REQUEST_TIMEOUT_MS || '30000', 10), // 30s
-  streamTimeoutMs: parseInt(process.env.STREAM_TIMEOUT_MS || '1800000', 10), // 30m
+  streamTimeoutMs: parseInt(process.env.STREAM_TIMEOUT_MS || '10800000', 10), // 3 giờ
   
   // Whitelist domains (TikTok, YouTube, Bilibili)
   allowedDomains: [

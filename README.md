@@ -24,7 +24,7 @@
   * Tự động inject header `Referer` chống lỗi 403 Forbidden từ CDN Bilibili.
 * **Bảo Mật & Quản Lý Tài Nguyên:**
   * Chống tấn công SSRF với domain whitelist nghiêm ngặt và chặn IP mạng nội bộ.
-  * Giới hạn thời lượng video tối đa (mặc định 30 phút) để bảo vệ CPU.
+  * Giới hạn thời lượng video tối đa (mặc định 3 giờ) để bảo vệ CPU.
   * Tự động giải phóng tiến trình FFmpeg / child process khi client ngắt kết nối (`req.on('close')`), chống rò rỉ tiến trình zombie.
 
 ---
@@ -150,7 +150,7 @@ Kiểm tra tình trạng hoạt động (Healthcheck cho Docker).
 | :--- | :--- | :--- |
 | `PORT` | `3000` | Cổng HTTP lắng nghe |
 | `HOST` | `0.0.0.0` | Địa chỉ IP bind |
-| `MAX_DURATION` | `1800` | Thời lượng video tối đa cho phép (giây) |
+| `MAX_DURATION` | `10800` | Thời lượng video tối đa cho phép (giây, mặc định 3 giờ) |
 | `COOKIES_PATH` | `./cookies.txt` | Đường dẫn file cookies cho yt-dlp |
 | `REQUEST_TIMEOUT_MS` | `30000` | Thời gian timeout khi bóc tách thông tin |
 

@@ -64,3 +64,17 @@ export function getSafeContentDisposition(rawTitle, ext = 'mp4') {
     contentDisposition
   };
 }
+
+/**
+ * Định dạng thời lượng giới hạn tối đa thân thiện cho người dùng (ví dụ: '30 phút', '3 giờ')
+ * @param {number} seconds 
+ * @returns {string}
+ */
+export function formatDurationLimit(seconds) {
+  if (!seconds || isNaN(seconds) || seconds <= 0) return '0 phút';
+  const minutes = Math.round(seconds / 60);
+  if (minutes >= 60 && minutes % 60 === 0) {
+    return `${minutes / 60} giờ`;
+  }
+  return `${minutes} phút`;
+}

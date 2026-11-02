@@ -52,6 +52,10 @@ describe('Validator Utility & SSRF Protection', () => {
   it('kiểm tra giới hạn thời lượng video', () => {
     assert.strictEqual(isDurationAllowed(600), true); // 10 phút -> hợp lệ
     assert.strictEqual(isDurationAllowed(1800), true); // 30 phút -> hợp lệ
-    assert.strictEqual(isDurationAllowed(3600), false); // 60 phút -> vượt quá giới hạn
+    assert.strictEqual(isDurationAllowed(3600), true); // 60 phút (1 giờ) -> hợp lệ
+    assert.strictEqual(isDurationAllowed(4691), true); // 1:18:11 -> hợp lệ
+    assert.strictEqual(isDurationAllowed(10800), true); // 3 giờ -> hợp lệ
+    assert.strictEqual(isDurationAllowed(10801), false); // > 3 giờ -> vượt quá giới hạn
+    assert.strictEqual(isDurationAllowed(14400), false); // 4 giờ -> vượt quá giới hạn
   });
 });

@@ -1,6 +1,6 @@
 import { ytdlpService } from '../services/ytdlpService.js';
 import { isDurationAllowed } from '../utils/validator.js';
-import { formatDuration, formatFileSize } from '../utils/formatHelper.js';
+import { formatDuration, formatFileSize, formatDurationLimit } from '../utils/formatHelper.js';
 import { config } from '../config.js';
 
 export const bilibiliExtractor = {
@@ -17,7 +17,7 @@ export const bilibiliExtractor = {
     });
 
     if (info.duration && !isDurationAllowed(info.duration)) {
-      throw new Error(`Video dài ${formatDuration(info.duration)}, vượt quá giới hạn tối đa cho phép (${Math.round(config.maxDurationSeconds / 60)} phút).`);
+      throw new Error(`Video dài ${formatDuration(info.duration)}, vượt quá giới hạn tối đa cho phép (${formatDurationLimit(config.maxDurationSeconds)}).`);
     }
 
     const rawFormats = info.formats || [];

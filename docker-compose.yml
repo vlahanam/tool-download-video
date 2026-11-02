@@ -11,7 +11,7 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - HOST=0.0.0.0
-      - MAX_DURATION=1800
+      - MAX_DURATION=10800
       - COOKIES_PATH=/app/cookies.txt
     volumes:
       # Mount file cookies.txt nếu có để vượt bot detection của YouTube
